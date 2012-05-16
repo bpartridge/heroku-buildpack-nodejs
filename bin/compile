@@ -4,6 +4,8 @@
 # fail fast
 set -e
 
+echo "Using custom buildpack!"
+
 # debug
 # set -x
 
