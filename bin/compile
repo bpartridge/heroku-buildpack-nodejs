@@ -159,9 +159,7 @@ echo "-----> Vendoring node into slug"
 mkdir -p "$BUILD_DIR/bin"
 cp "$VENDORED_NODE/bin/node" "$BUILD_DIR/bin/node"
 
-cat $VENDORED_SCONS/scons.py
-cp $VENDORED_SCONS/scons.py $VENDORED_SCONS/scons
-chmod +x $VENDORED_SCONS/scons
+cp $VENDORED_SCONS/scons.py $VENDORED_SCONS/scons && chmod +x $VENDORED_SCONS/scons
 
 # setting up paths for building
 export PATH="$VENDORED_SCONS:$VENDORED_NODE/bin:$PATH"
