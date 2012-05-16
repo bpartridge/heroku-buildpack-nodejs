@@ -17,7 +17,7 @@ SCONS_VERSION="1.2.0"
 S3_BUCKET="heroku-buildpack-nodejs"
 
 BUNDLER_VERSION="1.2.0.pre"
-BUNDLER_GEM_PATH="bundler-${BUNDLER_VERSION}"
+BUNDLER_PACKAGE_FILE="bundler-${BUNDLER_VERSION}"
 BUNDLER_S3_BUCKET="heroku-buildpack-ruby"
 
 # parse and derive params
@@ -145,7 +145,7 @@ CACHE_TARGET_DIR="$BUILD_DIR/node_modules"
 NODE_PACKAGE="http://${S3_BUCKET}.s3.amazonaws.com/nodejs-${NODE_VERSION}.tgz"
 NPM_PACKAGE="http://${S3_BUCKET}.s3.amazonaws.com/npm-${NPM_VERSION}.tgz"
 SCONS_PACKAGE="http://${S3_BUCKET}.s3.amazonaws.com/scons-${SCONS_VERSION}.tgz"
-BUNDLER_PACKAGE="http://${BUNDLER_S3_BUCKET}.s3.amazonaws.com/${BUNDLER_GEM_PATH}.tgz"
+BUNDLER_PACKAGE="http://${BUNDLER_S3_BUCKET}.s3.amazonaws.com/${BUNDLER_PACKAGE_FILE}.tgz"
 
 # vendor directories
 VENDORED_NODE="$(mktmpdir node)"
@@ -172,6 +172,7 @@ ls $VENDORED_BUNDLER/bin
 
 # setting up paths for building
 export PATH="$VENDORED_BUNDLER/bin:$VENDORED_SCONS:$VENDORED_NODE/bin:$PATH"
+export GEM_PATH="${VENDORED_BUNDLER}"
 INCLUDE_PATH="$VENDORED_NODE/include"
 export CPATH="$INCLUDE_PATH"
 export CPPPATH="$INCLUDE_PATH"
