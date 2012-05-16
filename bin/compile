@@ -16,6 +16,10 @@ unset GIT_DIR
 SCONS_VERSION="1.2.0"
 S3_BUCKET="heroku-buildpack-nodejs"
 
+BUNDLER_VERSION = "1.2.0.pre"
+BUNDLER_GEM_PATH = "bundler-#{BUNDLER_VERSION}"
+BUNDLER_S3_BUCKET="heroku-buildpack-ruby"
+
 # parse and derive params
 BUILD_DIR=$1
 CACHE_DIR=$2
@@ -141,17 +145,21 @@ CACHE_TARGET_DIR="$BUILD_DIR/node_modules"
 NODE_PACKAGE="http://${S3_BUCKET}.s3.amazonaws.com/nodejs-${NODE_VERSION}.tgz"
 NPM_PACKAGE="http://${S3_BUCKET}.s3.amazonaws.com/npm-${NPM_VERSION}.tgz"
 SCONS_PACKAGE="http://${S3_BUCKET}.s3.amazonaws.com/scons-${SCONS_VERSION}.tgz"
+BUNDLER_PACKAGE="http://${BUNDLER_S3_BUCKET}.s3.amazonaws.com/${BUNDLER_GEM_PATH}.tgz"
 
 # vendor directories
 VENDORED_NODE="$(mktmpdir node)"
 VENDORED_NPM="$(mktmpdir npm)"
 VENDORED_SCONS="$(mktmpdir scons)"
+VENDORED_BUNDLER="$(mktmpdir bundler)"
 
 # download and unpack packages
 echo "-----> Fetching Node.js binaries"
 package_download "nodejs" "${NODE_VERSION}" "${VENDORED_NODE}"
 package_download "npm" "${NPM_VERSION}" "${VENDORED_NPM}"
 package_download "scons" "${SCONS_VERSION}" "${VENDORED_SCONS}"
+# package_download "bundler" "${BUNDLER_VERSION}" "${VENDORED_BUNDLER}"
+curl "${BUNDLER_PACKAGE}" -s -o - | tar xzf "${VENDORED_BUNDLER}"
 
 # vendor node into the slug
 PATH="$BUILD_DIR/bin:$PATH"
@@ -160,9 +168,10 @@ mkdir -p "$BUILD_DIR/bin"
 cp "$VENDORED_NODE/bin/node" "$BUILD_DIR/bin/node"
 
 cp $VENDORED_SCONS/scons.py $VENDORED_SCONS/scons && chmod +x $VENDORED_SCONS/scons
+ls $VENDORED_BUNDLER
 
 # setting up paths for building
-export PATH="$VENDORED_SCONS:$VENDORED_NODE/bin:$PATH"
+export PATH="$VENDORED_BUNDLER/bin:$VENDORED_SCONS:$VENDORED_NODE/bin:$PATH"
 INCLUDE_PATH="$VENDORED_NODE/include"
 export CPATH="$INCLUDE_PATH"
 export CPPPATH="$INCLUDE_PATH"
